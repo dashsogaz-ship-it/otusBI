@@ -210,6 +210,46 @@ S1(config-line)#
 Для того, чтобы начал работать пароль.
 
 
+№ ЧАСТЬ 3
+№№ Шаг 2. Протестируйте сквозное соединение, отправив эхо-запрос.
+a.	В командной строке компьютера PC-A с помощью утилиты ping проверьте связь сначала с адресом PC-A.
+C:\> ping 192.168.1.10 
+b.	Из командной строки компьютера PC-A отправьте эхо-запрос на административный адрес интерфейса SVI коммутатора S1.
+C:\> ping 192.168.1.2
+Если эхо-запрос не удается, найдите и устраните неполадки базовых настроек устройства. Проверьте как физические кабели, так и логическую адресацию.
+```
+
+Vlan1                  192.168.1.2     YES manual administratively down down
+S1# conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#int vlan
+% Incomplete command.
+S1(config)#int vlan ?
+  <1-4094>  Vlan interface number
+S1(config)#int vlan 1?
+<1-4094>  
+S1(config)#int vlan 1
+S1(config-if)#no shutdown
+
+S1(config-if)#
+%LINK-5-CHANGED: Interface Vlan1, changed state to up
+
+%LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to up
+
+```
+![](cpt3.png)
+
+## Шаг 3. Проверьте удаленное управление коммутатором S1.
+![](cpt4.png)
+
+
+Вопросы для повторения.
+1.	Зачем необходимо настраивать пароль VTY для коммутатора? для доступа к коммутатору по SSH/Telnet
+2.	Что нужно сделать, чтобы пароли не отправлялись в незашифрованном виде? использовать команду service password-encryption
+
+
+
+
 
 
 
