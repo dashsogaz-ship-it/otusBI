@@ -10,7 +10,7 @@
 
 
 
-
+#Шаг 3. Выполните инициализацию и перезагрузку коммутаторов.
 ```
 '''S1#erase startup-config 
 Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
@@ -24,3 +24,5 @@ C2960 Boot Loader (C2960-HBOOT-M) Version 12.2(25r)FX, RELEASE SOFTWARE (fc4)
 Cisco WS-C2960-24TT (RC32300) processor (revision C0) with 21039K bytes of memory.
 2960-24TT starting...
 ```
+Шаг 4. Настройте базовые параметры каждого коммутатора.
+
