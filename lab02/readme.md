@@ -89,3 +89,93 @@ b.	Подключитесь к коммутаторам S1 и S2 через ко
 
 ![](3CPT.png)
 
+После ЭХО запросов отобразились mac=адреса всех подключенных устройств.
+Определить к каким устройствам принадлежат адреса можно ориентируясь на порты в коммутаторе fa0/6 и fa 0/18.
+
+
+№№Шаг 4. С компьютера PC-B отправьте эхо-запросы устройствам в сети и просмотрите таблицу МАС-адресов коммутатора.
+
+a.	На компьютере PC-B откройте командную строку и еще раз введите команду arp -a.
+
+```
+S2#show mac address-table
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+
+   1    0004.9aa5.db01    DYNAMIC     Fa0/1
+```
+Одна пара ip и mac.
+b.	Из командной строки PC-B отправьте эхо-запросы на компьютер PC-A, а также коммутаторы S1 и S2.
+Ответ получен от всех устройств.
+```
+C:\>ping 192.168.1.1
+
+Pinging 192.168.1.1 with 32 bytes of data:
+
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=128
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=128
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=128
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=128
+
+Ping statistics for 192.168.1.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+
+C:\>ping 192.168.1.11
+
+Pinging 192.168.1.11 with 32 bytes of data:
+
+Request timed out.
+Reply from 192.168.1.11: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.11: bytes=32 time=4ms TTL=255
+Reply from 192.168.1.11: bytes=32 time<1ms TTL=255
+
+Ping statistics for 192.168.1.11:
+    Packets: Sent = 4, Received = 3, Lost = 1 (25% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 4ms, Average = 1ms
+
+C:\>ping 192.168.1.12
+
+Pinging 192.168.1.12 with 32 bytes of data:
+
+Reply from 192.168.1.12: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.12: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.12: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.12: bytes=32 time<1ms TTL=255
+
+Ping statistics for 192.168.1.12:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+```
+c.	Подключившись через консоль к коммутатору S2, введите команду show mac address-table.
+
+```
+S2#show mac address-table
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+
+   1    0004.9aa5.db01    DYNAMIC     Fa0/1
+S2#show mac address-table
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+
+   1    0002.4a96.a266    DYNAMIC     Fa0/1
+   1    0004.9aa5.db01    DYNAMIC     Fa0/1
+   1    000a.41cb.4328    DYNAMIC     Fa0/1
+   1    0060.5c76.4c49    DYNAMIC     Fa0/18
+```
+адреса остались прежними.
+
+
