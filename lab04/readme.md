@@ -216,5 +216,83 @@ Vlan1 is up, line protocol is up
 ```
 
 ###Шаг 4. Назначьте компьютерам статические IPv6-адреса.
-
+a)
 ![](cpt8.png)
+
+##Часть 3. Проверка сквозного подключения
+
+PC-A 
+```
+C:\>ping fe80::1
+
+Pinging fe80::1 with 32 bytes of data:
+
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+
+Ping statistics for FE80::1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+
+C:\>ping 2001:db8:acad:1::b
+
+Pinging 2001:db8:acad:1::b with 32 bytes of data:
+
+Reply from 2001:DB8:ACAD:1::B: bytes=32 time=3ms TTL=255
+Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+
+Ping statistics for 2001:DB8:ACAD:1::B:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 3ms, Average = 0ms
+C:\>tracert 2001:db8:acad:a::3
+
+Tracing route to 2001:db8:acad:a::3 over a maximum of 30 hops: 
+
+  1   0 ms      0 ms      0 ms      2001:DB8:ACAD:1::1
+  2   0 ms      0 ms      0 ms      2001:DB8:ACAD:A::3
+
+Trace complete.
+```
+
+PC-B
+
+```
+C:\>ping 2001:db8:acad:1::3
+
+Pinging 2001:db8:acad:1::3 with 32 bytes of data:
+
+Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+
+Ping statistics for 2001:DB8:ACAD:1::3:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+
+C:\>ping 2001:db8:acad:a::1
+
+Pinging 2001:db8:acad:a::1 with 32 bytes of data:
+
+Reply from 2001:DB8:ACAD:A::1: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:A::1: bytes=32 time=3ms TTL=255
+Reply from 2001:DB8:ACAD:A::1: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:A::1: bytes=32 time<1ms TTL=255
+
+Ping statistics for 2001:DB8:ACAD:A::1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 3ms, Average = 0ms
+```
+Вопросы для повторения
+1 Потому что link-local ipv6 адреса работают только внутри своей локлаьной сети.
+2 acad
+
+
