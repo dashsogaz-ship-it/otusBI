@@ -96,4 +96,66 @@ b.	Настройте для PC-A шлюз по умолчанию.
 
 #Часть 2. Настройка маршрутизатора для доступа по протоколу SSH
 
+№№Шаг 1. Настройте аутентификацию устройств.
+
+a.	Задайте имя устройства.
+b.	Задайте домен для устройства.
+```
+R1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#ip dom
+R1(config)#ip domain
+R1(config)#ip domain-na
+R1(config)#ip domain-name cisco.com
+R1(config)#hostname R1
+```
+##Шаг 2. Создайте ключ шифрования с указанием его длины.
+```
+R1(config)#crypt
+R1(config)#crypto key gen
+R1(config)#crypto key generate rsa
+The name for the keys will be: R1.cisco.com
+```
+##Шаг 3. Создайте имя пользователя в локальной базе учетных записей.
+```
+R1(config)#username admin secret Adm1nP@55
+R1(config)#
+```
+##Шаг 4. Активируйте протокол SSH на линиях VTY.
+
+a.	Активируйте протоколы Telnet и SSH на входящих линиях VTY с помощью команды transport input.
+b.	Измените способ входа в систему таким образом, чтобы использовалась проверка пользователей по локальной базе учетных записей.
+```
+R1(config-line)#transport input ?
+  all     All protocols
+  none    No protocols
+  ssh     TCP/IP SSH protocol
+  telnet  TCP/IP Telnet protocol
+R1(config-line)#transport input ss
+R1(config-line)#transport input ssh/tel
+R1(config-line)#transport input ssh tel
+R1(config-line)#transport input all
+R1(config-line)#login local
+R1(config-line)#ip ssh vers 2
+R1(config)#sho
+R1(config)#do show ip ssh
+SSH Enabled - version 2.0
+```
+##Шаг 5. Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+
+##Шаг 5. Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+```
+R1#copy running
+R1#copy running-config start
+R1#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+```
+
+##Шаг 6. Установите соединение с маршрутизатором по протоколу SSH.
+
+a.	Запустите Tera Term с PC-A.
+b.	Установите SSH-подключение к R1. Use the username admin and password Adm1nP@55. У вас должно получиться установить SSH-подключение к R1.
+
 
