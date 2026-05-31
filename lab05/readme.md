@@ -160,4 +160,110 @@ b.	Установите SSH-подключение к R1. Use the username admin
 
 ![](cpt05.png)
 
+№Часть 3. Настройка коммутатора для доступа по протоколу SSH
 
+Шаг 1. Настройте основные параметры коммутатора.
+a.	Подключитесь к коммутатору с помощью консольного подключения и активируйте привилегированный режим EXEC.
+b.	Войдите в режим конфигурации.
+c.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+d.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
+e.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+f.	Назначьте cisco в качестве пароля VTY и включите вход в систему по паролю.
+g.	Зашифруйте открытые пароли.
+h.	Создайте баннер, который предупреждает о запрете несанкционированного доступа.
+i.	Настройте и активируйте на коммутаторе интерфейс VLAN 1, используя информацию, приведенную в таблице адресации.
+j.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+
+```
+S1>enable
+S1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#no ip domain-lookup
+S1(config)#enable secret class
+S1(config)#line cons
+S1(config)#line console 0
+S1(config-line)#passworrd cisco
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#
+S1(config)#line vty 0 4
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#service password encr
+S1(config)#service password encrypt
+S1(config)#exit
+S1(config)#service password
+S1(config)#service password-encryption 
+S1(config)#banner motd #ALARM!
+S1(config)#banner motd #ALARM! Unauthorized access prohibited!!!#
+S1(config)#interface vlan 1
+S1(config-if)#ip add
+S1(config-if)#ip address 192.168.1.11 255.255.255.0
+S1(config-if)#no shutdown
+
+S1(config-if)#
+%LINK-3-UPDOWN: Interface Vlan1, changed state to down
+
+%LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to up
+
+S1(config-if)#exit
+S1(config)#exit
+S1#copy startup-config running-config
+Destination filename [running-config]? 
+
+1076 bytes copied in 0.416 secs (2586 bytes/sec)
+S1#
+%LINK-5-CHANGED: Interface Vlan1, changed state to administratively down
+
+%LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to down
+
+%SYS-5-CONFIG_I: Configured from console by console
+
+```
+##Шаг 2. Настройте коммутатор для соединения по протоколу SSH.
+a.	Настройте имя устройства, как указано в таблице адресации.
+b.	Задайте домен для устройства.
+c.	Создайте ключ шифрования с указанием его длины.
+d.	Создайте имя пользователя в локальной базе учетных записей.
+e.	Активируйте протоколы Telnet и SSH на линиях VTY.
+f.	Измените способ входа в систему таким образом, чтобы использовалась проверка пользователей по локальной базе учетных записей.
+
+```
+S1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#ip domain
+S1(config)#ip domain-n
+S1(config)#ip domain-name cisco2960.com
+S1(config)#crypto key
+S1(config)#crypto key gen
+S1(config)#crypto key generate rsa
+The name for the keys will be: S1.cisco2960.com
+Choose the size of the key modulus in the range of 360 to 4096 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 1024
+% Generating 1024 bit RSA keys, keys will be non-exportable...[OK]
+
+S1(config)#username admin secret Adm1nP@55
+*Mar 1 8:15:32.280: %SSH-5-ENABLED: SSH 1.99 has been enabled
+S1(config)#transpor
+S1(config)#lyne vt
+S1(config)#line vty 0 4
+S1(config-line)#transpor
+S1(config-line)#transport inp
+S1(config-line)#transport input all
+S1(config-line)#version 2
+S1(config-line)#ip ssh version 2
+S1(config)#login local
+S1(config)#line vty
+% Incomplete command.
+S1(config)#line vty 0 4
+S1(config-line)#login local
+S1(config-line)#
+```
+##Шаг 3. Установите соединение с коммутатором по протоколу SSH.
+
+![](cpt06.png)
