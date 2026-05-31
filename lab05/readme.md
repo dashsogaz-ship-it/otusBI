@@ -158,4 +158,6 @@ Building configuration...
 a.	Запустите Tera Term с PC-A.
 b.	Установите SSH-подключение к R1. Use the username admin and password Adm1nP@55. У вас должно получиться установить SSH-подключение к R1.
 
+![](cpt05.png)
+
 
