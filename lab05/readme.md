@@ -41,7 +41,7 @@ Proceed with reload? [confirm]
 Initializing Hardware ...
 ```
 
-Шаг 3. Настройте маршрутизатор.
+##Шаг 3. Настройте маршрутизатор.
 
 a.	Подключитесь к маршрутизатору с помощью консоли и активируйте привилегированный режим EXEC.
 b.	Войдите в режим конфигурации.
@@ -83,6 +83,9 @@ R1(config-if)#
 
 %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0/1, changed state to up
 ```
+##Шаг 4. Настройте компьютер PC-A.
+a.	Настройте для PC-A IP-адрес и маску подсети.
+b.	Настройте для PC-A шлюз по умолчанию.
 
 
 
