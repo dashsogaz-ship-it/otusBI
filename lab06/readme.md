@@ -280,4 +280,180 @@ S1(config-if)#sw access vl 20
 
 b.![](cpt4.png)
 
+#Часть 3. Конфигурация магистрального канала стандарта 802.1Q между коммутаторами
+
+##Шаг 1. Вручную настройте магистральный интерфейс F0/1 на коммутаторах S1 и S2.
+a.	Настройка статического транкинга на интерфейсе F0/1 для обоих коммутаторов.
+Откройте окно конфигурации
+b.	Установите native VLAN 1000 на обоих коммутаторах.
+c.	Укажите, что VLAN 10, 20, 30 и 1000 могут проходить по транку.
+d.	Проверьте транки, native VLAN и разрешенные VLAN через транк.
+
+###S1
+```
+S1(config)#int f0/1
+S1(config-if)#switchport mode trunk
+S1(config-if)#
+S1(config-if)#swicthport trunk native vlan 1000
+S1(config)#int f0/1
+S1(config-if)#sw tr native vlan 1000
+S1(config-if)#switchport trunk allowe
+S1(config-if)#switchport trunk
+S1(config-if)#switchport trunk all
+S1(config-if)#switchport trunk allowed vlan 10,20,30,1000
+S1(config-if)#exit
+S1(config)#do show int trunk
+Port        Mode         Encapsulation  Status        Native vlan
+Fa0/1       on           802.1q         trunking      1000
+
+Port        Vlans allowed on trunk
+Fa0/1       10,20,30,1000
+
+Port        Vlans allowed and active in management domain
+Fa0/1       10,20,30,1000
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Fa0/1       10,20,30,1000
+```
+S2
+
+```
+S2(config)#int f0/1
+S2(config-if)#sw m tr
+S2(config-if)#sw tr native vlan 1000
+S2(config-if)#%SPANTREE-2-UNBLOCK_CONSIST_PORT: Unblocking FastEthernet0/1 on VLAN1000. Port consistency restored.
+S2(config-if)#switchport trunk allowed vlan 10,20,30,1000
+S2(config-if)#exit
+S2(config)#
+S2(config)#do show int trunk
+Port        Mode         Encapsulation  Status        Native vlan
+Fa0/1       on           802.1q         trunking      1000
+
+Port        Vlans allowed on trunk
+Fa0/1       10,20,30,1000
+
+Port        Vlans allowed and active in management domain
+Fa0/1       10,20,30,1000
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Fa0/1       10,20,30,1000
+
+S2#show interface f0/1 sw
+Trunking Native Mode VLAN: 1000 (VLAN1000)
+```
+
+##SШаг 2. Вручную настройте магистральный интерфейс F0/5 на коммутаторе S1.
+a.	Настройте интерфейс S1 F0/5 с теми же параметрами транка, что и F0/1. Это транк до маршрутизатора.
+b.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+c.	Проверка транкинга.
+Вопрос:
+Что произойдет, если G0/0/1 на R1 будет отключен?
+###a.
+```
+S1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#int f0/5
+S1(config-if)#switchport mode trunk
+S1(config-if)#swicthport trunk native vlan 1000
+                 ^
+% Invalid input detected at '^' marker.
+	
+S1(config-if)#switchport trunk native vlan 1000
+S1(config-if)#switchport trunk allowed vlan 10,20,30,1000
+```
+
+###b.
+```
+S1#copy run
+S1#copy running-config st
+S1#copy running-config startup-config
+```
+##c.
+При проверке транков (show interface trunk) с выключенным портом g0/0/1 не отображается в таблице транков порт f0/5, так как маоршрутизатор не принимает и не передаёт трафик.
+
+№Часть 4. Настройка маршрутизации между сетями VLAN
+№№Шаг 1. Настройте маршрутизатор.
+Откройте окно конфигурации
+a.	При необходимости активируйте интерфейс G0/0/1 на маршрутизаторе.
+b.	Настройте подинтерфейсы для каждой VLAN, как указано в таблице IP-адресации. Все подинтерфейсы используют инкапсуляцию 802.1Q. Убедитесь, что подинтерфейсу для native VLAN не назначен IP-адрес. Включите описание для каждого подинтерфейса.
+c.	Убедитесь, что вспомогательные интерфейсы работают
+
+
+a.
+```
+R1(config)#interface gigabitEthernet 0/0/1
+R1(config-if)#no shut
+```
+b.
+```
+R1(config)#interface g0/0/1.10
+R1(config-subif)#
+%LINK-3-UPDOWN: Interface GigabitEthernet0/0/1.10, changed state to down
+R1(config-subif)#descryption
+R1(config-subif)#descrip
+R1(config-subif)#description management VLAN
+R1(config-subif)#encapsul
+R1(config-subif)#encapsulation dot1q 10
+R1(config-subif)#ip address 192.168.10.1 255.255.255.0
+R1(config-subif)#exit
+R1(config)#interface g0/0/1.20
+R1(config-subif)#
+R1(config-subif)#descript
+R1(config-subif)#description sales
+R1(config-subif)#description sales VLAN
+R1(config-subif)#encapsulatio
+R1(config-subif)#encapsulation dot1Q 20
+R1(config-subif)#ip address 192.168.20.1 255.255.255.0
+R1(config-subif)#interface g0/0/1.30
+R1(config-subif)#
+R1(config-subif)#descrip
+R1(config-subif)#description operations VLAN
+R1(config-subif)#encapsulat
+R1(config-subif)#encapsulation dot1Q 30
+R1(config-subif)#ip address 192.168.30.1 255.255.255.0
+R1(config-subif)#exit
+R1(config)#interface g0/0/1.1000
+R1(config-subif)#
+R1(config-subif)#descripti
+R1(config-subif)#description Native VLAN
+R1(config-subif)#encaps
+R1(config-subif)#encapsulation dot1Q 1000 native
+R1(config-subif)#end
+```
+c.
+```
+R1#show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol 
+GigabitEthernet0/0/0   unassigned      YES unset  administratively down down 
+GigabitEthernet0/0/1   unassigned      YES unset  up                    up 
+GigabitEthernet0/0/1.10192.168.10.1    YES manual up                    up 
+GigabitEthernet0/0/1.20192.168.20.1    YES manual up                    up 
+GigabitEthernet0/0/1.30192.168.30.1    YES manual up                    up 
+GigabitEthernet0/0/1.1000unassigned      YES unset  up                    up 
+Vlan1                  unassigned      YES unset  administratively down down
+R1#
+```
+# RЧасть 5. Проверьте, работает ли маршрутизация между VLAN
+##Шаг 1. Выполните следующие тесты с PC-A. Все должно быть успешно.
+Примечание. Возможно, вам придется отключить брандмауэр ПК для работы ping
+a.	Отправьте эхо-запрос с PC-A на шлюз по умолчанию.
+b.	Отправьте эхо-запрос с PC-A на PC-B.
+c.	Отправьте команду ping с компьютера PC-A на коммутатор S2.
+
+![](cpt5.png)
+
+## Шаг 2. Пройдите следующий тест с PC-B
+
+В окне командной строки на PC-B выполните команду tracert на адрес PC-A.
+Вопрос:
+Какие промежуточные IP-адреса отображаются в результатах?
+```
+C:\>tracert 192.168.20.3
+
+Tracing route to 192.168.20.3 over a maximum of 30 hops: 
+
+  1   0 ms      0 ms      2 ms      192.168.30.1
+  2   0 ms      0 ms      0 ms      192.168.20.3
+```
+Отображается подинтерфейся маршрутизатора.
 
