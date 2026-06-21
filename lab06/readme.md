@@ -142,6 +142,142 @@ Building configuration...
 
 ![](cpt2.png)
 
+#Часть 2. Создание сетей VLAN и назначение портов коммутатора
 
+##Шаг 1. Создайте сети VLAN на коммутаторах.
+a.	Создайте и назовите необходимые VLAN на каждом коммутаторе из таблицы выше.
+Откройте окно конфигурации
+b.	Настройте интерфейс управления и шлюз по умолчанию на каждом коммутаторе, используя информацию об IP-адресе в таблице адресации. 
+c.	Назначьте все неиспользуемые порты коммутатора VLAN Parking_Lot, настройте их для статического режима доступа и административно деактивируйте их.
+Примечание. Команда interface range полезна для выполнения этой задачи с минимальным количеством команд.
+##
+S1
+
+###a.
+```
+S1(config)#vlan 10
+S1(config-vlan)#exit
+S1(config)#vlan 20
+S1(config-vlan)#name sales
+S1(config-vlan)#exit
+S1(config)#vlan 30
+S1(config-vlan)#name operations
+S1(config-vlan)#exit
+S1(config)#vlan 999
+S1(config-vlan)#name parking_lot
+S1(config-vlan)#exit
+S1(config)#vlan 1000
+S1(config-vlan)#exit
+S1(config)#int v  10
+S1(config-if)#
+%LINK-5-CHANGED: Interface Vlan10, changed state to up
+```
+###b.
+```
+S1(config-if)#int v  10
+S1(config-if)#ip add 192.168.10.11 255.255.255.0
+S1(config-if)#no shut
+S1(config)#ip default-gateway 192.168.10.1
+```
+###c.
+```
+S1(config)#int r f0/2-4, f0/7-24, g0/1-2
+S1(config-if-range)#sw m a
+S1(config-if-range)#sw a v 999
+S1(config-if-range)#shut
+%LINK-5-CHANGED: Interface FastEthernet0/2, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/3, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/4, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/7, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/8, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/9, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/10, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/11, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/12, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/13, changed state to administratively down
+LINK-5-CHANGED: Interface FastEthernet0/14, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/15, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/16, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/17, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/18, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/19, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/20, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/21, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/22, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/23, changed state to administratively down
+%LINK-5-CHANGED: Interface FastEthernet0/24, changed state to administratively down
+%LINK-5-CHANGED: Interface GigabitEthernet0/1, changed state to administratively down
+
+```
+
+##S2
+
+a.
+```
+S2>enable
+Password: 
+S2#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+S2(config)#vlan 10
+S2(config-vlan)#^Z
+S2#
+%SYS-5-CONFIG_I: Configured from console by console
+
+S2#
+S2#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+S2(config)#vlan 20
+S2(config-vlan)#vlan 30
+S2(config-vlan)#name operations
+S2(config-vlan)#vlan 999
+S2(config-vlan)#name Parking_Lot
+S2(config-vlan)#vlan 1000
+S2(config-vlan)#do sh v
+% Ambiguous command: "sh v"
+S2(config-vlan)#exit
+```
+b.
+```
+S2(config)#int v 10
+S2(config-if)#
+%LINK-5-CHANGED: Interface Vlan10, changed state to up
+
+S2(config-if)#ip address 192.168.10.12 255.255.255.0
+S2(config-if)#no shut
+S2(config-if)#exit
+S2(config)#ip deaf
+S2(config)#ip defau
+S2(config)#ip default-gateway 192.168.10.1
+S2(config)#exit
+```
+c.
+```
+S2(config)#int range f0/2-17, f0/19-24, g0/1-2
+S2(config-if-range)#switch
+S2(config-if-range)#switchport mode access
+S2(config-if-range)#sw access vlan 999
+S2(config-if-range)#shut
+```
+## Шаг 2. Назначьте сети VLAN соответствующим интерфейсам коммутатора.
+a.	Назначьте используемые порты соответствующей VLAN (указанной в таблице VLAN выше) и настройте их для режима статического доступа.
+b.	Убедитесь, что VLAN назначены на правильные интерфейсы.
+
+a.
+```
+S2(config)#int f0/18
+S2(config-if)#sw mode access
+S2(config-if)#sw a v 30
+S2(config-if)#exit
+
+S1(config)#int fastEthernet 0/6
+S1(config-if)#switch
+S1(config-if)#switchport mod
+S1(config-if)#switchport mode acc
+S1(config-if)#switchport mode access 
+S1(config-if)#sw access vl 20
+```
+
+
+b.![](cpt4.png)
 
 
