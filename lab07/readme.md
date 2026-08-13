@@ -53,14 +53,68 @@ S1(config)#interface
 S1(config)#interface vlan 1
 S1(config-if)#ip address 192.168.1.1 255.255.255.0
 S1(config-if)#end
-S1#
-%SYS-5-CONFIG_I: Configured from console by console
-
-S1#copy running
-S1#copy running-config start
 S1#copy running-config startup-config 
 Destination filename [startup-config]? 
 Building configuration...
 [OK]
 ```
 ###S2
+
+```
+Switch(config)#hostname S2
+S2(config)#no ip domain-look
+S2(config)#no ip domain-lookup 
+S2(config)#enable secret class
+S2(config)#line console 0
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#line vty 0 15
+S2(config-line)#pass
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#logging synch
+S2(config-line)#logging synchronous 
+S2(config-line)#banner motd # Unauthorized access denied #
+S2(config)#interface vlan 1
+S2(config-if)#ip address 192.168.1.2 255.255.255.0
+S2#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+```
+###S3
+```
+
+Switch(config)#hostname S3
+S3(config)#no ip domain-lookup
+S3(config)#enable secret class
+S3(config)#line console 0
+S3(config-line)#password cisco
+S3(config-line)#login
+S3(config-line)#exit
+S3(config)#line vty 0 15
+S3(config-line)#password cisco
+S3(config-line)#login
+S3(config-line)#logging sync
+S3(config-line)#logging synchronous 
+S3(config-line)#bannerbanner motd # Unauthorized access denied #
+                ^
+% Invalid input detected at '^' marker.
+	
+S3(config-line)#banner motd # Unauthorized access denied #
+S3(config)#interface vlan 1
+S3(config-if)#ip address 192.168.1.3 255.255.255.0
+S3(config-if)#exit
+S3(config)#exit
+S3#
+S3#copy running-conf
+S3#copy running-config start
+S3#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+```
+
+
+
