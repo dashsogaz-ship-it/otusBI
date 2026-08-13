@@ -115,6 +115,76 @@ Destination filename [startup-config]?
 Building configuration...
 [OK]
 ```
+##Шаг 4:	Проверьте связь.
+Включаем порты на каждом коммутаторе командой interface range fastethernet 0/1 - 4
+Проверьте способность компьютеров обмениваться эхо-запросами.
+Успешно ли выполняется эхо-запрос от коммутатора S1 на коммутатор S2?	Успешно
+Успешно ли выполняется эхо-запрос от коммутатора S1 на коммутатор S3?	Успешно
+Успешно ли выполняется эхо-запрос от коммутатора S2 на коммутатор S3?	Успешно
+Выполняйте отладку до тех пор, пока ответы на все вопросы не будут положительными.
+S1
+```
 
+S1#ping 192.168.1.2
 
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.2, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 0/1/6 ms
+S1#ping 192.168.1.3
 
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.3, timeout is 2 seconds:
+..!!!
+Success rate is 60 percent (3/5), round-trip min/avg/max = 0/0/0 ms
+```
+S2
+```
+S2#ping 192.168.1.3
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.3, timeout is 2 seconds:
+..!!!
+Success rate is 60 percent (3/5), round-trip min/avg/max = 0/1/4 ms
+```
+
+#Часть 2:	Определение корневого моста
+##Шаг 1:	Отключите все порты на коммутаторах.
+```
+S1(config)#interface range fast
+S1(config)#interface range fastEthernet 0/1 - 24
+S1(config-if-range)#shutdown
+S2(config)#interface range fastEthernet 0/1 - 24
+S2(config-if-range)#shut
+S3(config)#interface range fastEthernet 0/1 - 24
+S3(config-if-range)#shut
+```
+##Шаг 2:	Настройте подключенные порты в качестве транковых.
+```
+S1(config)#interface range fastEthernet 0/1 - 4
+S1(config-if-range)#switchport mode trunk
+S2(config)#interface range fastEthernet 0/1 - 4
+S2(config-if-range)#switchpor
+S2(config-if-range)#switchport mode trunk
+S3(config)#interface range fastEthernet 0/1 - 4
+S3(config-if-range)#switchp
+S3(config-if-range)#switchport mode trunk
+```
+##Шаг 3:	Включите порты F0/2 и F0/4 на всех коммутаторах.
+```
+S1(config)#interface fastEthernet 0/2
+S1(config-if)#no shut
+S1(config-if)#interface fastEthernet 0/4
+S1(config-if)#no shut
+
+S2(config)#interface fastEthernet 0/2
+S2(config-if)#no shut
+S2(config-if)#interface fastEthernet 0/4
+S2(config-if)#no shut
+
+S3(config)#interface fastEthernet 0/2
+S3(config-if)#no shut
+S3(config-if)#interface fastEthernet 0/4
+S3(config-if)#no shut
+```
+##Шаг 4:	Отобразите данные протокола spanning-tree.
