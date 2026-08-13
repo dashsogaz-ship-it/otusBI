@@ -2,8 +2,8 @@
 Топология
 ![](cpt.png)
 
-№ Часть 1:	Создание сети и настройка основных параметров устройства
-№№ Шаг 1:	Создайте сеть согласно топологии.
+# Часть 1:	Создание сети и настройка основных параметров устройства
+## Шаг 1:	Создайте сеть согласно топологии.
 
 ![](cpt1.png)
 
@@ -297,5 +297,111 @@ Interface        Role Sts Cost      Prio.Nbr Type
 Fa0/2            Root FWD 19        128.2    P2p
 Fa0/4            Altn BLK 19        128.4    P2p
 ```
+
+##Шаг 2:	Измените стоимость порта.
+```
+S3#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+S3(config)#interface f0/2
+S3(config-if)#spanning-tr
+S3(config-if)#spanning-tree vlan 1 cost 18
+```
+##Шаг 3:	Просмотрите изменения протокола spanning-tree.
+S1
+```
+S1#show span
+VLAN0001
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    32769
+             Address     0010.114E.64B1
+             Cost        19
+             Port        2(FastEthernet0/2)
+             Hello Time  2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     0050.0F04.AC20
+             Hello Time  2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  20
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Fa0/4            Desg FWD 19        128.4    P2p
+Fa0/2            Root FWD 19        128.2    P2p
+
+S1#show sp
+VLAN0001
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    32769
+             Address     0010.114E.64B1
+             Cost        19
+             Port        2(FastEthernet0/2)
+             Hello Time  2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     0050.0F04.AC20
+             Hello Time  2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  20
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Fa0/4            Altn BLK 19        128.4    P2p
+Fa0/2            Root FWD 19        128.2    P2p
+```
+S3
+```
+S3#show spa
+VLAN0001
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    32769
+             Address     0010.114E.64B1
+             Cost        18
+             Port        2(FastEthernet0/2)
+             Hello Time  2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     00E0.F7B0.ECD0
+             Hello Time  2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  20
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Fa0/2            Root FWD 18        128.2    P2p
+```
+Почему протокол spanning-tree заменяет ранее заблокированный порт на назначенный порт и блокирует порт, который был назначенным портом на другом коммутаторе?
+Потому что S3 имеет меньшую стоимость к корню 18, чем S1.
+
+##Шаг 4:	Удалите изменения стоимости порта.
+```
+S3(config)#interface f 0/2
+S3(config-if)#no span
+S3(config-if)#no spanning-tree vlan 1 cost 18
+S3(config-if)#end
+S3#
+%SYS-5-CONFIG_I: Configured from console by console
+
+S3#show span
+VLAN0001
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    32769
+             Address     0010.114E.64B1
+             Cost        19
+             Port        2(FastEthernet0/2)
+             Hello Time  2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     00E0.F7B0.ECD0
+             Hello Time  2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  20
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Fa0/2            Root FWD 19        128.2    P2p
+Fa0/4            Altn BLK 19        128.4    P2p
+```
+
+# Часть 4:	Наблюдение за процессом выбора протоколом STP порта, исходя из приоритета портов
+a.	Включите порты F0/1 и F0/3 на всех коммутаторах.
+b.	Подождите 30 секунд, чтобы протокол STP завершил процесс перевода порта, после чего выполните команду show spanning-tree на коммутаторах некорневого моста. Обратите внимание, что порт корневого моста переместился на порт с меньшим номером, связанный с коммутатором корневого моста, и заблокировал предыдущий порт корневого моста.
+
 
 
